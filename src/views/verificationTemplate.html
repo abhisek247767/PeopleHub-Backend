@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fa;
+            margin: 0;
+            padding: 0;
+        }
+        .email-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .email-header {
+            text-align: center;
+            padding-bottom: 20px;
+        }
+        .email-header h1 {
+            font-size: 24px;
+            color: #4CAF50;
+            margin: 0;
+        }
+        .email-body {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            padding: 20px 0;
+        }
+        .verification-code {
+            font-size: 24px;
+            font-weight: bold;
+            color: #4CAF50;
+            padding: 10px 0;
+        }
+        .email-footer {
+            text-align: center;
+            font-size: 14px;
+            color: #888;
+            padding: 20px 0;
+            border-top: 1px solid #f1f1f1;
+        }
+        .email-footer a {
+            color: #4CAF50;
+            text-decoration: none;
+        }
+        .email-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <h1>Email Verification</h1>
+        </div>
+        <div class="email-body">
+            <p>Hello, {{username}}</p>
+            <p>We received a request to verify your email address. Please use the following 6-digit code to complete the verification process:</p>
+            <p class="verification-code">{{verificationCode}}</p>
+            <p>If you did not request this, please ignore this email.</p>
+        </div>
+        <div class="email-footer">
+            <p>Thank you for using our service.</p>
+            <p>If you have any questions, feel free to <a href="#">contact us</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
