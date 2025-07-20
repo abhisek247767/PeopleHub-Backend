@@ -1,6 +1,6 @@
 # 1. Clone the backend repo
-git clone https://github.com/abhisek247767/PeopleHub-Backend.git
-cd PeopleHub-Backend
+- git clone https://github.com/abhisek247767/PeopleHub-Backend.git
+- cd PeopleHub-Backend
 
 # 2. Install backend dependencies
 npm install
