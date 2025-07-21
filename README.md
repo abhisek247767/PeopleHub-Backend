@@ -13,3 +13,5 @@ npm install
 - JWT_SECRET=123456789
 # 4. Start the backend server
 npm start
+
+congratulations you have set up the backend repo, now go to frontend repo https://github.com/abhisek247767/PeopleHub-Frontend
