@@ -15,3 +15,4 @@ npm install
 npm start
 
 congratulations you have set up the backend repo, now go to frontend repo https://github.com/abhisek247767/PeopleHub-Frontend
+## Please follow me and star the repo for my motivation :)
