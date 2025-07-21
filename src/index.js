@@ -3,6 +3,7 @@ const express = require("express");
 const app = express()
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
+const userRoutes = require("./routes/user");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const cors = require("cors");
@@ -62,4 +63,4 @@ mongoose.connect(DB)
         })
 
 
-app.use(authRoutes);
+app.use(authRoutes, userRoutes);
