@@ -1,10 +1,19 @@
-// routes/department.js
 const express = require('express');
 const router = express.Router();
-const { authenticate } = require('../middleware/authMiddleware');
-const { fetchDepartment,fetchSubDepartment } = require('../controllers/departmentController');
 
+// Import controller functions
+const { createEmployee } = require('../controllers/userController'); // New import
+const { fetchDepartment, fetchSubDepartment } = require('../controllers/departmentController'); // Existing import
+
+// Import the authentication middleware
+const { authenticate } = require('../middleware/authMiddleware');
+
+// Existing Department Routes
 router.get('/departments', fetchDepartment);
-router.get('/subDepartments', fetchSubDepartment);
+router.get('/subDepartment', fetchSubDepartment);
+
+// New Employee Creation Route
+// It is protected by the authenticate middleware, allowing only 'superadmin' and 'admin' roles to create employees.
+router.post('/create-employee', createEmployee);
 
 module.exports = router;
