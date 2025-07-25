@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Import controller functions
 const { createEmployee } = require('../controllers/userController'); // New import
-const { fetchDepartment, fetchSubDepartment } = require('../controllers/departmentController'); // Existing import
+const { fetchDepartment, fetchSubDepartment } = require('../controllers/DepartmentController'); // Existing import
 
 // Import the authentication middleware
 const { authenticate } = require('../middleware/authMiddleware');
