@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 // Import controller functions
-const { createEmployee } = require('../controllers/userController'); // New import
+const { createEmployee, getEmployees } = require('../controllers/userController'); // New import
 const { fetchDepartment, fetchSubDepartment } = require('../controllers/DepartmentController'); // Existing import
 
 // Import the authentication middleware
@@ -15,5 +15,6 @@ router.get('/subDepartment', fetchSubDepartment);
 // New Employee Creation Route
 // It is protected by the authenticate middleware, allowing only 'superadmin' and 'admin' roles to create employees.
 router.post('/create-employee', createEmployee);
+router.get('/employees', getEmployees);
 
 module.exports = router;
