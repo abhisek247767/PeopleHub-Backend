@@ -11,6 +11,8 @@ npm install
 - SESSION_SECRET=123456789
 - JWT_REFRESH_SECRET=123456789
 - JWT_SECRET=123456789
+- API_BASE_URL=https://projectapi.gerasim.in/api/EmployeeManagement
+
 # 4. Start the backend server
 npm start
 
