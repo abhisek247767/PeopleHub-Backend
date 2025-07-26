@@ -1,9 +1,12 @@
 // controllers/departmentController.js
 const axios = require('axios');
+require('dotenv').config(); // Ensure this is present if not already in your entry file (e.g., app.js)
+
+const BASE_URL = process.env.API_BASE_URL;
 
 const fetchDepartment = async (req, res) => {
   try {
-    const response = await axios.get('https://projectapi.gerasim.in/api/EmployeeManagement/GetParentDepartment');
+    const response = await axios.get(`${BASE_URL}/GetParentDepartment`);
     res.status(200).json(response.data);
   } catch (error) {
     console.error('Error fetching departments:', error.message);
@@ -12,16 +15,14 @@ const fetchDepartment = async (req, res) => {
 };
 
 const fetchSubDepartment = async (req, res) => {
-  const deptId = req.query.deptId; // ✅ extract deptId from query
+  const deptId = req.query.deptId;
 
   if (!deptId) {
     return res.status(400).json({ message: 'Missing deptId parameter' });
   }
 
   try {
-    const response = await axios.get(
-      `https://projectapi.gerasim.in/api/EmployeeManagement/GetChildDepartmentByParentId?deptId=${deptId}`
-    );
+    const response = await axios.get(`${BASE_URL}/GetChildDepartmentByParentId?deptId=${deptId}`);
     res.status(200).json(response.data);
   } catch (error) {
     console.error('Error fetching sub-departments:', error.message);
@@ -29,4 +30,4 @@ const fetchSubDepartment = async (req, res) => {
   }
 };
 
-module.exports = { fetchDepartment,fetchSubDepartment };
+module.exports = { fetchDepartment, fetchSubDepartment };
