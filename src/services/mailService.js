@@ -61,7 +61,7 @@ const sendVerificationEmail = async (email, username, code, type = 'verification
 
         const mailOptions = {
             from: {
-                name: 'Your App Name',
+                name: 'PeopleHub Team',
                 address: process.env.EMAIL_USER
             },
             to: email,
