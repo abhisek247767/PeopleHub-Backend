@@ -12,7 +12,7 @@ npm install
 - JWT_REFRESH_SECRET=123456789
 - JWT_SECRET=123456789
 - API_BASE_URL=https://projectapi.gerasim.in/api/EmployeeManagement
-- EMAIL_USER=androhacker1234@gmail.com
+- EMAIL_USER=your-email
 - EMAIL_PASS=bcis nnby plef uofc
 
 # 4. Get the Email_User and Email_pass
