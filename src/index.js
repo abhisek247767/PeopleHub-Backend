@@ -18,11 +18,13 @@ const DB = process.env.MONGO_URI
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 app.use(cors({
   origin: 'http://localhost:4200',
-  methods: 'GET,POST',
+  methods: 'GET,POST,PUT',
   credentials: true,
 }));
 

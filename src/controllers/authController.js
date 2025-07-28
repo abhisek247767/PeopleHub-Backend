@@ -3,10 +3,13 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const generateVerificationCode = require('../utils/generateVerificationCode');
 const {sendVerificationEmail} = require('../services/mailService');
+const path = require('path');
+const fs = require('fs');
 
 const createUser = async (req, res) => {
     try {
         const { username, email, password, confirmPassword } = req.body;
+        let profilePicture = req.file ? req.file.filename : undefined;
         
         // Validation
         if (!username || !email || !password || !confirmPassword) {
@@ -32,7 +35,8 @@ const createUser = async (req, res) => {
             password, 
             verificationCode, 
             verificationCodeValidation: new Date(Date.now() + 3600000), // 1 hour
-            verified: false
+            verified: false,
+            profilePicture // add profilePicture if present
         });
         
         await user.save();
@@ -397,18 +401,63 @@ const logoutUser = async (req, res) => {
 
 const fetchAccountData = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('username email verified role');
+        const user = await User.findById(req.user.userId).select('username email verified role profilePicture');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        res.json(user);      
+        res.json(user);
     } catch (error) {
         console.error('Error fetching account data:', error.message);
         res.status(500).json({ 
             message: 'Failed to fetch account data', 
             detail: error.message 
         });
+    }
+};
+
+// Serve profile picture
+const getProfilePicture = async (req, res) => {
+    try {
+        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+        const userId = req.params.userId;
+        const user = await User.findById(userId);
+        if (!user || !user.profilePicture) {
+            return res.status(404).send('Profile picture not found');
+        }
+        const filePath = path.join(__dirname, '../../uploads/profile-pictures', user.profilePicture);
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).send('Profile picture file not found');
+        }
+        res.sendFile(filePath);
+    } catch (err) {
+        res.status(500).send('Error retrieving profile picture');
+    }
+};
+
+const updateProfile = async (req, res) => {
+    try {
+        const userId = req.user.userId;
+        const { username, password } = req.body;
+        let updateFields = {};
+        if (username) updateFields.username = username;
+        if (password) updateFields.password = password;
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (req.file) {
+            // Delete old profile picture if exists
+            if (user.profilePicture) {
+                const oldPath = path.join(__dirname, '../../uploads/profile-pictures', user.profilePicture);
+                if (fs.existsSync(oldPath)) {
+                    fs.unlinkSync(oldPath);
+                }
+            }
+            updateFields.profilePicture = req.file.filename;
+        }
+        const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+        res.json({ message: 'Profile updated successfully', user: updatedUser });
+    } catch (err) {
+        res.status(500).json({ message: 'Error updating profile' });
     }
 };
 
@@ -421,5 +470,7 @@ module.exports = {
     resetPassword,
     changePassword,
     logoutUser,
-    fetchAccountData
+    fetchAccountData,
+    getProfilePicture,
+    updateProfile
 };

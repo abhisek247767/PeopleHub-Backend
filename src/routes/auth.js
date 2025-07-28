@@ -7,15 +7,30 @@ const {
     resetPassword,
     changePassword,
     logoutUser,
-    fetchAccountData
+    fetchAccountData,
+    getProfilePicture,
+    updateProfile
 } = require("../controllers/authController");
 
 const { authenticate } = require("../middleware/authMiddleware");
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
+
+// Multer configuration for profile picture upload
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, '../../uploads/profile-pictures'));
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + '-' + file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
 
 // Public routes
-router.post('/signup', createUser);
+router.post('/signup', upload.single('profilePicture'), createUser);
 router.post('/verify', verifyUser);
 router.post('/resend-verification', resendVerificationCode);
 router.post('/login', loginUser);
@@ -26,5 +41,7 @@ router.post('/reset-password', resetPassword);
 router.post('/logout', authenticate(['superadmin', 'admin', 'user']), logoutUser);
 router.get('/me', authenticate(), fetchAccountData);
 router.post('/change-password', authenticate(), changePassword);
+router.get('/profile-picture/:userId', getProfilePicture);
+router.put('/update-profile', authenticate(), upload.single('profilePicture'), updateProfile);
 
 module.exports = router;
