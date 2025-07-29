@@ -118,6 +118,14 @@ const updateProfile = [upload.single('profilePicture'), async (req, res) => {
             updateData.profilePicture = req.file.buffer;
             updateData.profilePictureType = req.file.mimetype;
         }
+        // If password is being updated, hash it before saving
+        if (updateData.password && updateData.password !== '********') {
+            const bcrypt = require('bcrypt');
+            const salt = await bcrypt.genSalt();
+            updateData.password = await bcrypt.hash(updateData.password, salt);
+        } else {
+            delete updateData.password;
+        }
         const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
         res.status(200).json({ message: 'Profile updated successfully', user: updatedUser });
     } catch (error) {
