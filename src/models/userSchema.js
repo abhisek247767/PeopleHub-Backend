@@ -34,7 +34,8 @@ const userSchema = new mongoose.Schema({
     verificationCodeValidation: { type: Date },
     forgotPasswordCode: { type: String },
     forgotPasswordCodeValidation: { type: Date },
-    profilePicture: { type: String, required: false },
+    profilePicture: { type: Buffer, required: false },
+    profilePictureType: { type: String, required: false },
 }, { timestamps: true });
 
 // Hash password before saving user

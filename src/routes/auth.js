@@ -8,8 +8,6 @@ const {
     changePassword,
     logoutUser,
     fetchAccountData,
-    getProfilePicture,
-    updateProfile
 } = require("../controllers/authController");
 
 const { authenticate } = require("../middleware/authMiddleware");
@@ -41,7 +39,5 @@ router.post('/reset-password', resetPassword);
 router.post('/logout', authenticate(['superadmin', 'admin', 'user']), logoutUser);
 router.get('/me', authenticate(), fetchAccountData);
 router.post('/change-password', authenticate(), changePassword);
-router.get('/profile-picture/:userId', getProfilePicture);
-router.put('/update-profile', authenticate(), upload.single('profilePicture'), updateProfile);
 
 module.exports = router;

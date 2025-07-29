@@ -3,8 +3,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const generateVerificationCode = require('../utils/generateVerificationCode');
 const {sendVerificationEmail} = require('../services/mailService');
-const path = require('path');
-const fs = require('fs');
 
 const createUser = async (req, res) => {
     try {
@@ -415,52 +413,6 @@ const fetchAccountData = async (req, res) => {
     }
 };
 
-// Serve profile picture
-const getProfilePicture = async (req, res) => {
-    try {
-        res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-        res.setHeader('Access-Control-Allow-Credentials', 'true');
-        const userId = req.params.userId;
-        const user = await User.findById(userId);
-        if (!user || !user.profilePicture) {
-            return res.status(404).send('Profile picture not found');
-        }
-        const filePath = path.join(__dirname, '../../uploads/profile-pictures', user.profilePicture);
-        if (!fs.existsSync(filePath)) {
-            return res.status(404).send('Profile picture file not found');
-        }
-        res.sendFile(filePath);
-    } catch (err) {
-        res.status(500).send('Error retrieving profile picture');
-    }
-};
-
-const updateProfile = async (req, res) => {
-    try {
-        const userId = req.user.userId;
-        const { username, password } = req.body;
-        let updateFields = {};
-        if (username) updateFields.username = username;
-        if (password) updateFields.password = password;
-        const user = await User.findById(userId);
-        if (!user) return res.status(404).json({ message: 'User not found' });
-        if (req.file) {
-            // Delete old profile picture if exists
-            if (user.profilePicture) {
-                const oldPath = path.join(__dirname, '../../uploads/profile-pictures', user.profilePicture);
-                if (fs.existsSync(oldPath)) {
-                    fs.unlinkSync(oldPath);
-                }
-            }
-            updateFields.profilePicture = req.file.filename;
-        }
-        const updatedUser = await User.findByIdAndUpdate(userId, updateFields, { new: true });
-        res.json({ message: 'Profile updated successfully', user: updatedUser });
-    } catch (err) {
-        res.status(500).json({ message: 'Error updating profile' });
-    }
-};
-
 module.exports = {
     createUser, 
     verifyUser, 
@@ -470,7 +422,5 @@ module.exports = {
     resetPassword,
     changePassword,
     logoutUser,
-    fetchAccountData,
-    getProfilePicture,
-    updateProfile
+    fetchAccountData
 };
