@@ -6,9 +6,9 @@ const {sendVerificationEmail} = require('../services/mailService');
 
 const createUser = async (req, res) => {
     try {
+        // Extract data from request body
         const { username, email, password, confirmPassword } = req.body;
-        let profilePicture = req.file ? req.file.filename : undefined;
-        
+
         // Validation
         if (!username || !email || !password || !confirmPassword) {
             return res.status(400).json({ message: "All fields are required" });
@@ -26,15 +26,14 @@ const createUser = async (req, res) => {
 
         const verificationCode = generateVerificationCode();
 
-        // Create user with unverified status
+        // Create user with unverified status (no profilePicture)
         const user = new User({ 
             username, 
             email, 
             password, 
             verificationCode, 
             verificationCodeValidation: new Date(Date.now() + 3600000), // 1 hour
-            verified: false,
-            profilePicture // add profilePicture if present
+            verified: false
         });
         
         await user.save();
