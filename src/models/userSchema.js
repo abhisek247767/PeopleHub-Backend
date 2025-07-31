@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
@@ -35,6 +34,8 @@ const userSchema = new mongoose.Schema({
     verificationCodeValidation: { type: Date },
     forgotPasswordCode: { type: String },
     forgotPasswordCodeValidation: { type: Date },
+    profilePicture: { type: Buffer, required: false },
+    profilePictureType: { type: String, required: false },
 }, { timestamps: true });
 
 // Hash password before saving user
