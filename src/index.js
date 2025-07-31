@@ -14,15 +14,18 @@ const PORT = process.env.PORT || 3000;
 const DB = process.env.MONGO_URI
 
 //app.use(express.static('./dist/employee'));
+FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:4200';
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 app.use(cors({
-  origin: 'http://localhost:4200',
-  methods: 'GET,POST',
+  origin: FRONTEND_BASE_URL,
+  methods: 'GET,POST,PUT',
   credentials: true,
 }));
 
