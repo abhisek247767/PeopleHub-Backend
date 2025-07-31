@@ -24,6 +24,7 @@
     "helmet": "^8.0.0",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.8.4",
+    "multer": "^2.0.2",
     "nodemailer": "^6.9.16",
     "validator": "^13.12.0"
   },
