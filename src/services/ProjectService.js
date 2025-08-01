@@ -11,135 +11,117 @@ class ProjectService {
      * @param {Object} createdBy - User creating the project (must be admin)
      * @returns {Object} Created project
      */
-    static async createProject(projectData, createdBy) {
+static async createProject(projectData, createdBy) {
         // Check if creator has admin privileges
-        if (createdBy.role !== 'admin' && createdBy.role !== 'superadmin') {
-            throw new Error('Access denied. Only admins can create projects.');
+    if (createdBy.role !== 'admin' && createdBy.role !== 'superadmin') {
+        throw new Error('Access denied. Only admins can create projects.');
+    }
+
+    const { 
+        projectName, 
+        projectDescription, 
+        deliveryManager, 
+        manager, 
+        lead, 
+        developers,
+        startDate,
+        endDate,
+        priority,
+        budget
+    } = projectData;
+
+    try {
+        // Clean and validate user IDs (same as before)
+        const cleanUserId = (id) => {
+            if (!id) return null;
+            let cleanId;
+            if (typeof id === 'object' && id._id) {
+                cleanId = id._id.toString();
+            } else {
+                cleanId = id.toString().trim();
+            }
+            const match = cleanId.match(/(?:^['"]|:\s*['"])([a-f0-9]{24})['"]?$/);
+            if (match) cleanId = match[1];
+            if (!mongoose.Types.ObjectId.isValid(cleanId)) {
+                throw new Error(`Invalid user ID: ${id}`);
+            }
+            return cleanId;
+        };
+
+        // Clean all IDs (duplicates allowed)
+        const deliveryManagerId = cleanUserId(deliveryManager);
+        const managerId = cleanUserId(manager);
+        const leadId = cleanUserId(lead);
+        const developerIds = developers?.map(cleanUserId).filter(Boolean) || [];
+
+        // Combine all non-null IDs (duplicates allowed)
+        const userIds = [
+            deliveryManagerId, 
+            managerId, 
+            leadId, 
+            ...developerIds
+        ].filter(Boolean);
+
+        // Validate user existence and roles (if any IDs provided)
+        if (userIds.length > 0) {
+            const users = await User.find({ 
+                _id: { $in: userIds },
+                role: { $in: ['employee', 'admin', 'superadmin', 'user'] }
+            }).lean();
+
+            const foundUserIds = users.map(user => user._id.toString());
+            const missingUserIds = userIds.filter(id => !foundUserIds.includes(id));
+
+            if (missingUserIds.length > 0) {
+                throw new Error(
+                    `Invalid or non-employee users: ${missingUserIds.join(', ')}`
+                );
+            }
         }
 
-        const { 
-            projectName, 
-            projectDescription, 
-            deliveryManager, 
-            manager, 
-            lead, 
-            developers,
+        // Check for duplicate project name (case-insensitive)
+        const existingProject = await Project.findOne({ 
+            projectName: { $regex: new RegExp(`^${projectName}$`, 'i') }
+        });
+        if (existingProject) {
+            throw new Error('Project name already exists.');
+        }
+
+        // Create and save the project (duplicate IDs allowed)
+        const project = new Project({
+            projectName,
+            projectDescription,
+            deliveryManager: deliveryManagerId,
+            manager: managerId,
+            lead: leadId,
+            developers: developerIds,
             startDate,
             endDate,
-            priority,
-            budget
-        } = projectData;
-
-        console.log('Raw project data received:', {
-            deliveryManager,
-            manager,
-            lead,
-            developers
+            priority: priority || 'medium',
+            budget,
+            createdBy: createdBy._id
         });
 
-        try {
-            // Validate and clean user IDs
-            const cleanUserId = (id) => {
-                if (!id) return null;
-                
-                // Handle cases where id might be an object or malformed string
-                let cleanId;
-                if (typeof id === 'object' && id._id) {
-                    cleanId = id._id.toString();
-                } else {
-                    cleanId = id.toString().trim();
-                }
-
-                // Handle malformed string formats
-                // Pattern like "0: '688a5bd17bf7a83b4c14c960'" or "1: '688a5bd17bf7a83b4c14c960'"
-                let match = cleanId.match(/\d+:\s*['"]([a-f0-9]{24})['"]$/);
-                if (match) {
-                    cleanId = match[1];
-                }
-
-                // Pattern like "'688a5bd17bf7a83b4c14c960'" 
-                match = cleanId.match(/^['"]([a-f0-9]{24})['"]$/);
-                if (match) {
-                    cleanId = match[1];
-                }
-
-                // Validate ObjectId format
-                if (!mongoose.Types.ObjectId.isValid(cleanId)) {
-                    throw new Error(`Invalid user ID format: ${id} -> ${cleanId}`);
-                }
-
-                return cleanId;
-            };
-
-            const deliveryManagerId = cleanUserId(deliveryManager);
-            const managerId = cleanUserId(manager);
-            const leadId = cleanUserId(lead);
-            const developerIds = developers ? developers.map(cleanUserId).filter(Boolean) : [];
-
-            const userIds = [deliveryManagerId, managerId, leadId, ...developerIds]
-                .filter(Boolean); // Remove null values
-
-            // Remove duplicates
-            const uniqueUserIds = [...new Set(userIds)];
-
-            console.log('Processing user IDs:', uniqueUserIds);
-
-            // Validate that all referenced users exist and are employees
-            const users = await User.find({ 
-                _id: { $in: uniqueUserIds },
-                role: { $in: ['employee', 'admin', 'superadmin'] }
-            });
-
-            if (users.length !== uniqueUserIds.length) {
-                const foundUserIds = users.map(user => user._id.toString());
-                const missingUserIds = uniqueUserIds.filter(id => !foundUserIds.includes(id));
-                throw new Error(`One or more assigned users do not exist or are not employees. Missing: ${missingUserIds.join(', ')}`);
-            }
-
-            // Check if project name already exists
-            const existingProject = await Project.findOne({ 
-                projectName: { $regex: new RegExp(`^${projectName}$`, 'i') }
-            });
-            if (existingProject) {
-                throw new Error('Project with this name already exists');
-            }
-
-            // Create project
-            const project = new Project({
-                projectName,
-                projectDescription,
-                deliveryManager: deliveryManagerId,
-                manager: managerId,
-                lead: leadId,
-                developers: developerIds,
-                startDate,
-                endDate,
-                priority: priority || 'medium',
-                budget,
-                createdBy: createdBy._id
-            });
-
-            await project.save();
+        await project.save();
 
             // Populate team member details
-            await project.populate([
-                { path: 'deliveryManagerDetails', select: 'username email' },
-                { path: 'managerDetails', select: 'username email' },
-                { path: 'leadDetails', select: 'username email' },
-                { path: 'developerDetails', select: 'username email' },
-                { path: 'createdByDetails', select: 'username email' }
-            ]);
+        await project.populate([
+            { path: 'deliveryManagerDetails', select: 'username email' },
+            { path: 'managerDetails', select: 'username email' },
+            { path: 'leadDetails', select: 'username email' },
+            { path: 'developerDetails', select: 'username email' },
+            { path: 'createdByDetails', select: 'username email' }
+        ]);
 
-            return {
-                success: true,
-                message: 'Project created successfully',
-                project: project
-            };
-
-        } catch (error) {
-            throw new Error(`Failed to create project: ${error.message}`);
-        }
+        return { 
+            success: true, 
+            message: 'Project created successfully', 
+            project 
+        };
+    } catch (error) {
+        throw new Error(`Project creation failed: ${error.message}`);
     }
+}
 
     /**
      * Get project by ID with team details
