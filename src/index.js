@@ -4,6 +4,8 @@ const app = express()
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const employeeRoutes = require("./routes/employee");
+const projectRoutes = require("./routes/project");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const cors = require("cors");
@@ -25,7 +27,7 @@ app.use(helmet({
 
 app.use(cors({
   origin: FRONTEND_BASE_URL,
-  methods: 'GET,POST,PUT',
+  methods: 'GET,POST,PUT,DELETE',
   credentials: true,
 }));
 
@@ -49,6 +51,20 @@ app.use(
     })
 )
 
+// Health check route
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Server is running', 
+        timestamp: new Date().toISOString(),
+        routes: {
+            auth: '/auth/*',
+            users: '/users/*',
+            employees: '/employees/*',
+            projects: '/projects/*'
+        }
+    });
+});
 
 // app.get('/', (req, res) => {
 //     res.send('running');
@@ -66,4 +82,4 @@ mongoose.connect(DB)
         })
 
 
-app.use(authRoutes, userRoutes);
+app.use(authRoutes, userRoutes, employeeRoutes, projectRoutes);
