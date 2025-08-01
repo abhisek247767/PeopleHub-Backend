@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const user = require("../models/userSchema");
+const User = require("../models/userSchema");
 
 const authenticate = (roles = []) => {
   return async (req, res, next) => {
@@ -37,13 +37,29 @@ const authenticate = (roles = []) => {
 
       req.user = decoded;
 
+      // Fetch full user data for services that need it
+      try {
+        const userId = decoded.userId || decoded.id || decoded._id;
+        if (userId) {
+          const fullUser = await User.findById(userId);
+          if (fullUser) {
+            req.user = { ...decoded, ...fullUser.toJSON(), _id: fullUser._id };
+          }
+        }
+      } catch (userFetchError) {
+        console.warn('Could not fetch full user data:', userFetchError.message);
+      }
+
       // Role-based access control
-      if (roles.length && !roles.includes(decoded.role)) {
-        console.log(`User ${decoded.userId} attempted to access restricted resource`);
+      const userRole = req.user.role || decoded.role;
+      if (roles.length && !roles.includes(userRole)) {
+        const userId = req.user._id || req.user.userId || req.user.id;
+        console.log(`User ${userId} with role ${userRole} attempted to access restricted resource requiring roles: ${roles.join(', ')}`);
         return res.status(403).json({ message: 'Access denied. Insufficient permissions.' });
       }
 
-      console.log(`User ${decoded.userId} authenticated successfully`);
+      const userId = req.user._id || req.user.userId || req.user.id;
+      console.log(`User ${userId} authenticated successfully with role: ${userRole}`);
       next();
     } catch (error) {
       if (error instanceof jwt.JsonWebTokenError) {
