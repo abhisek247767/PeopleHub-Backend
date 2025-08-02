@@ -8,13 +8,23 @@ const createUser = async (req, res) => {
       req.body.password,
       req.body.confirmPassword
     );
-
     res.status(201).json(data);
   } catch (error) {
-    console.error("Error in createUser controller : ", error.message);
-    res.status(400).json({ message: error.message });
+    console.error("Error in createUser controller:", error);
+
+    if (error.name === 'ValidationError') {
+      const errorMessages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({ errors: errorMessages });
+    }
+    
+    if (error.code === 11000) {
+      return res.status(400).json({ message: "User with this email already exists" });
+    }
+    
+    res.status(500).json({ message: error.message || "Signup failed!" });
   }
 };
+
 
 const verifyUser = async (req, res) => {
   try {
@@ -149,19 +159,16 @@ const logoutUser = async (req, res) => {
 
 const fetchAccountData = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select(
-      "username email verified role"
-    );
+    const user = await User.findById(req.user.userId).select('username email verified role profilePicture');
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      return res.status(404).json({ message: 'User not found' });
     }
-
     res.json(user);
   } catch (error) {
-    console.error("Error fetching account data:", error.message);
-    res.status(500).json({
-      message: "Failed to fetch account data",
-      detail: error.message,
+    console.error('Error fetching account data:', error.message);
+    res.status(500).json({ 
+      message: 'Failed to fetch account data', 
+      detail: error.message 
     });
   }
 };

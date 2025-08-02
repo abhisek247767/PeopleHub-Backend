@@ -7,7 +7,7 @@ const {
     resetPassword,
     changePassword,
     logoutUser,
-    fetchAccountData
+    fetchAccountData,
 } = require("../controllers/authController");
 
 const { authenticate } = require("../middleware/authMiddleware");

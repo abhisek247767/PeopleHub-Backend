@@ -4,6 +4,8 @@ const app = express()
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
+const employeeRoutes = require("./routes/employee");
+const projectRoutes = require("./routes/project");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const cors = require("cors");
@@ -14,15 +16,18 @@ const PORT = process.env.PORT || 3000;
 const DB = process.env.MONGO_URI
 
 //app.use(express.static('./dist/employee'));
+FRONTEND_BASE_URL = process.env.FRONTEND_BASE_URL || 'http://localhost:4200';
 
 // Middleware
 app.use(express.json());
 app.use(cookieParser());
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" }
+}));
 
 app.use(cors({
-  origin: 'http://localhost:4200',
-  methods: 'GET,POST',
+  origin: FRONTEND_BASE_URL,
+  methods: 'GET,POST,PUT,DELETE',
   credentials: true,
 }));
 
@@ -46,6 +51,20 @@ app.use(
     })
 )
 
+// Health check route
+app.get('/api/health', (req, res) => {
+    res.json({ 
+        status: 'OK', 
+        message: 'Server is running', 
+        timestamp: new Date().toISOString(),
+        routes: {
+            auth: '/auth/*',
+            users: '/users/*',
+            employees: '/employees/*',
+            projects: '/projects/*'
+        }
+    });
+});
 
 // app.get('/', (req, res) => {
 //     res.send('running');
@@ -63,4 +82,4 @@ mongoose.connect(DB)
         })
 
 
-app.use(authRoutes, userRoutes);
+app.use(authRoutes, userRoutes, employeeRoutes, projectRoutes);
