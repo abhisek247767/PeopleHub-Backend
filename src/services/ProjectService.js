@@ -240,22 +240,22 @@ static async createProject(projectData, createdBy) {
             }
 
             // If updating team members, validate they exist and are employees
-            if (updateData.developers || updateData.manager || updateData.lead || updateData.deliveryManager) {
-                const userIds = [];
-                if (updateData.deliveryManager) userIds.push(updateData.deliveryManager);
-                if (updateData.manager) userIds.push(updateData.manager);
-                if (updateData.lead) userIds.push(updateData.lead);
-                if (updateData.developers) userIds.push(...updateData.developers);
+            // if (updateData.developers || updateData.manager || updateData.lead || updateData.deliveryManager) {
+            //     const userIds = [];
+            //     if (updateData.deliveryManager) userIds.push(updateData.deliveryManager);
+            //     if (updateData.manager) userIds.push(updateData.manager);
+            //     if (updateData.lead) userIds.push(updateData.lead);
+            //     if (updateData.developers) userIds.push(...updateData.developers);
 
-                const users = await User.find({ 
-                    _id: { $in: userIds },
-                    role: { $in: ['employee', 'admin', 'superadmin'] }
-                });
+            //     const users = await User.find({ 
+            //         _id: { $in: userIds },
+            //         role: { $in: ['employee', 'admin', 'superadmin'] }
+            //     });
 
-                if (users.length !== userIds.length) {
-                    throw new Error('One or more assigned users do not exist or are not employees');
-                }
-            }
+            //     if (users.length !== userIds.length) {
+            //         throw new Error('One or more assigned users do not exist or are not employees');
+            //     }
+            // }
 
             // Update project
             Object.assign(project, updateData);
