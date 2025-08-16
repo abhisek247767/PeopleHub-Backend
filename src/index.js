@@ -6,6 +6,7 @@ const authRoutes = require("./routes/auth");
 const userRoutes = require("./routes/user");
 const employeeRoutes = require("./routes/employee");
 const projectRoutes = require("./routes/project");
+const dashboardRoutes = require("./routes/dashboard");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const cors = require("cors");
@@ -82,4 +83,4 @@ mongoose.connect(DB)
         })
 
 
-app.use(authRoutes, userRoutes, employeeRoutes, projectRoutes);
+app.use(authRoutes, userRoutes, employeeRoutes, projectRoutes, dashboardRoutes);
