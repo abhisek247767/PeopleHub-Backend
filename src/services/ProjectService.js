@@ -344,6 +344,117 @@ static async createProject(projectData, createdBy) {
             throw new Error(`Failed to fetch user projects: ${error.message}`);
         }
     }
+
+    /**
+     * Get all projects with employee hierarchy (tree structure)
+     * @returns {Object} Tree-structured projects with team members
+     */
+static async getProjectsTree() {
+    try {
+        // Get all projects with populated team members
+        const projects = await Project.find()
+            .populate({
+                path: 'deliveryManager',
+                select: 'name email role employeeId'
+            })
+            .populate({
+                path: 'manager',
+                select: 'name email role employeeId'
+            })
+            .populate({
+                path: 'lead',
+                select: 'name email role employeeId'
+            })
+            .populate({
+                path: 'developers',
+                select: 'name email role employeeId'
+            })
+            .lean();
+
+        // Transform into tree structure
+        const projectsTree = projects.map(project => {
+            const treeNode = {
+                id: project._id.toString(),
+                name: project.projectName,
+                description: project.projectDescription,
+                status: project.status,
+                children: []
+            };
+
+            // Add delivery manager if exists
+            if (project.deliveryManager) {
+                treeNode.children.push({
+                    id: `dm-${project._id}`,
+                    name: 'Delivery Manager',
+                    role: 'delivery_manager',
+                    employee: {
+                        id: project.deliveryManager._id,
+                        name: project.deliveryManager.name,
+                        email: project.deliveryManager.email,
+                        employeeId: project.deliveryManager.employeeId
+                    }
+                });
+            }
+
+            // Add manager if exists
+            if (project.manager) {
+                treeNode.children.push({
+                    id: `mgr-${project._id}`,
+                    name: 'Project Manager',
+                    role: 'manager',
+                    employee: {
+                        id: project.manager._id,
+                        name: project.manager.name,
+                        email: project.manager.email,
+                        employeeId: project.manager.employeeId
+                    }
+                });
+            }
+
+            // Add lead if exists
+            if (project.lead) {
+                treeNode.children.push({
+                    id: `lead-${project._id}`,
+                    name: 'Team Lead',
+                    role: 'lead',
+                    employee: {
+                        id: project.lead._id,
+                        name: project.lead.name,
+                        email: project.lead.email,
+                        employeeId: project.lead.employeeId
+                    }
+                });
+            }
+
+            // Add developers if any
+            if (project.developers && project.developers.length > 0) {
+                const devGroup = {
+                    id: `devs-${project._id}`,
+                    name: 'Development Team',
+                    role: 'team',
+                    children: project.developers.map(dev => ({
+                        id: dev._id.toString(),
+                        name: dev.name,
+                        email: dev.email,
+                        role: 'developer',
+                        employeeId: dev.employeeId
+                    }))
+                };
+                treeNode.children.push(devGroup);
+            }
+
+            return treeNode;
+        });
+
+        return {
+            success: true,
+            count: projectsTree.length,
+            data: projectsTree
+        };
+    } catch (error) {
+        throw new Error(`Failed to generate projects tree: ${error.message}`);
+    }
+}
 }
 
 module.exports = ProjectService;
