@@ -52,6 +52,7 @@ npm install
 - API_BASE_URL=https://projectapi.gerasim.in/api/EmployeeManagement
 - EMAIL_USER=your-email
 - EMAIL_PASS=bcis nnby plef uofc
+- FRONTEND_BASE_URL=http://localhost:4200
 
 # 4. Get the Email_User and Email_pass
 To get the EMAIL_PASS for Gmail, you need to create an App Password (not your regular Gmail password). Here's how:
