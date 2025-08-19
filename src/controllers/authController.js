@@ -6,8 +6,9 @@ const {sendVerificationEmail} = require('../services/mailService');
 
 const createUser = async (req, res) => {
     try {
+        // Extract data from request body
         const { username, email, password, confirmPassword } = req.body;
-        
+
         // Validation
         if (!username || !email || !password || !confirmPassword) {
             return res.status(400).json({ message: "All fields are required" });
@@ -25,7 +26,7 @@ const createUser = async (req, res) => {
 
         const verificationCode = generateVerificationCode();
 
-        // Create user with unverified status
+        // Create user with unverified status (no profilePicture)
         const user = new User({ 
             username, 
             email, 
@@ -397,12 +398,11 @@ const logoutUser = async (req, res) => {
 
 const fetchAccountData = async (req, res) => {
     try {
-        const user = await User.findById(req.user.userId).select('username email verified role');
+        const user = await User.findById(req.user.userId).select('username email verified role profilePicture');
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        res.json(user);      
+        res.json(user);
     } catch (error) {
         console.error('Error fetching account data:', error.message);
         res.status(500).json({ 

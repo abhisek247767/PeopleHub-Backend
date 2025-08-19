@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
@@ -29,12 +28,14 @@ const userSchema = new mongoose.Schema({
             message: "Password must have at least one uppercase letter, one lowercase letter, one number, and one special character."
         },
     },
-    role: { type: String, enum: ['superadmin', 'admin', 'user'], default: 'user' },
+    role: { type: String, enum: ['superadmin', 'admin', 'user', 'employee'], default: 'user' },
     verified: { type: Boolean, default: false },
     verificationCode: { type: String },
     verificationCodeValidation: { type: Date },
     forgotPasswordCode: { type: String },
     forgotPasswordCodeValidation: { type: Date },
+    profilePicture: { type: Buffer, required: false },
+    profilePictureType: { type: String, required: false },
 }, { timestamps: true });
 
 // Hash password before saving user
