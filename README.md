@@ -1,8 +1,46 @@
-# 1. Clone the backend repo
-- git clone https://github.com/abhisek247767/PeopleHub-Backend.git
-- cd PeopleHub-Backend
+# PeopleHub Backend
 
-# 2. Install backend dependencies
+This is the backend server for the **PeopleHub** application – an Employee Management System. It is built with **Node.js**, **Express**, and **MongoDB** and handles authentication, session management, email notifications, and integration with an external API.
+
+---
+
+## 🚀 Features
+
+- Employee CRUD operations
+- Authentication using JWT tokens and session-based auth
+- Secure email notifications using Gmail SMTP
+- Modular project structure with MVC pattern
+- RESTful API integration with third-party services
+- Environment-based configuration
+
+---
+
+## 📦 Tech Stack
+
+![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)
+![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
+![MongoDB](https://img.shields.io/badge/MongoDB-4EA94B?style=for-the-badge&logo=mongodb&logoColor=white)
+![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white)
+![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=JSON%20web%20tokens&logoColor=white)
+![Nodemailer](https://img.shields.io/badge/Nodemailer-yellow?style=for-the-badge&logo=gmail&logoColor=white)
+![dotenv](https://img.shields.io/badge/dotenv-ECD53F?style=for-the-badge&logo=envato&logoColor=white)
+
+---
+
+## 🛠️ Getting Started
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/abhisek247767/PeopleHub-Backend.git
+cd PeopleHub-Backend
+```
+
+---
+
+### 2. Install Dependencies
+
+```bash
 npm install
 
 # 3. Create a .env file in the root of backend folder and add:
@@ -41,6 +79,60 @@ Or you could just enter the verification code from the mongodb database
 
 # 5. Start the backend server
 npm start
+```
 
-congratulations you have set up the backend repo, now go to frontend repo https://github.com/abhisek247767/PeopleHub-Frontend
-## Please follow me and star the repo for my motivation :)
+The server will run at:  
+👉 `http://localhost:3000`
+
+---
+
+## 🌐 API Base URL
+
+The backend interacts with this external API:
+
+```
+https://projectapi.gerasim.in/api/EmployeeManagement
+```
+
+---
+
+## 📁 Project Structure
+
+```bash
+PeopleHub-Backend/
+│
+├── src/                  # Source code 
+├── .dockerignore         # Files to ignore in Docker builds
+├── .gitignore            # Files to ignore in Git
+├── dockerfile            # Docker build instructions
+├── package.json          # Project metadata and dependencies
+├── package-lock.json     # Dependency lock file
+└── README.md             # Project documentation
+```
+
+---
+
+## 📲 Frontend Setup
+
+Once the backend is up and running, head over to the **Frontend Repo** and follow the setup instructions:
+
+🔗 [PeopleHub-Frontend Repository](https://github.com/abhisek247767/PeopleHub-Frontend)
+
+---
+
+## ❤️ Support the Developer
+
+If you like this project:
+
+⭐ **Star this repository**  
+👤 **Follow [@abhisek247767](https://github.com/abhisek247767)** for more cool projects
+
+> Your support helps keep the motivation alive!
+
+---
+
+## 📧 Contact
+
+For issues or questions, feel free to open an issue or reach out via GitHub.
+
+---
