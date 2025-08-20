@@ -126,6 +126,23 @@ class ProjectController {
             });
         }
     }
+
+    /**
+     * Get all projects with employee hierarchy (tree structure)
+     * GET /projects/tree
+     */
+    static async getProjectsTree(req, res) {
+        try {
+            const projects = await ProjectService.getProjectsTree();
+            res.status(200).json(projects);
+        } catch (error) {
+            console.error('Error fetching projects tree:', error);
+            res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
 }
 
 module.exports = ProjectController;
