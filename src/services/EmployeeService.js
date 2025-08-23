@@ -127,7 +127,7 @@ class EmployeeService {
     static async getAllEmployees(page = 1, limit = 10, filters = {}) {
         try {
             const skip = (page - 1) * limit;
-            
+
             // Build filter query
             let filterQuery = {};
             if (filters.department) filterQuery.department = filters.department;
@@ -159,6 +159,37 @@ class EmployeeService {
             };
         } catch (error) {
             throw new Error(`Failed to fetch employees: ${error.message}`);
+        }
+    }
+
+    /**
+     * Get employee leave balances
+     * @param {String} employeeId - Employee ID
+     * @returns {Object} Leave balances (sick, casual, privilege)
+     */
+    static async getEmployeeLeaves(employeeId) {
+        try {
+            // Validate employeeId
+            if (!mongoose.Types.ObjectId.isValid(employeeId)) {
+                throw new Error(`Invalid employee ID format: ${employeeId}`);
+            }
+
+            // Fetch employee with leave fields only
+            const employee = await Employee.findById(employeeId).select(
+                'sickLeave casualLeave privilegeLeave'
+            );
+
+            if (!employee) {
+                throw new Error('Employee not found');
+            }
+
+            return {
+                sickLeave: employee.sickLeave ?? 0,
+                casualLeave: employee.casualLeave ?? 0,
+                privilegeLeave: employee.privilegeLeave ?? 0
+            };
+        } catch (error) {
+            throw new Error(`Failed to fetch employee leaves: ${error.message}`);
         }
     }
 
@@ -258,9 +289,9 @@ class EmployeeService {
 
             // Optionally delete or deactivate user account
             // For now, we'll just change the role back to 'user'
-            await User.findByIdAndUpdate(employee.user_id, { 
+            await User.findByIdAndUpdate(employee.user_id, {
                 role: 'user',
-                verified: false 
+                verified: false
             });
 
             console.log('Employee deletion completed successfully');

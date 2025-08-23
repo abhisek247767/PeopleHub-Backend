@@ -68,6 +68,30 @@ class EmployeeController {
     }
 
     /**
+     * Get employee leave balances
+     * GET /employees/:id/leaves
+     */
+    static async getEmployeeLeaves(req, res) {
+        try {
+            const employeeId = req.params.id;
+
+            const leaves = await EmployeeService.getEmployeeLeaves(employeeId);
+
+            res.status(200).json({
+                success: true,
+                employeeId,
+                leaves
+            });
+        } catch (error) {
+            console.error('Error fetching employee leaves:', error);
+            res.status(400).json({
+                success: false,
+                message: error.message
+            });
+        }
+    }
+
+    /**
      * Update employee
      * PUT /employees/:id
      */
