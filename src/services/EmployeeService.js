@@ -2,6 +2,19 @@ const User = require('../models/userSchema');
 const Employee = require('../models/Employee');
 const Project = require('../models/Project');
 const mongoose = require('mongoose');
+const cron = require('node-cron');
+
+cron.schedule("0 0 1 * *", async () => {
+    try {
+        await Employee.updateMany({}, {
+            $set: { casualLeave: 1 }, // reset CL
+            $inc: { privilegeLeave: 1, sickLeave: 1 } // increment PL & SL
+        });
+        console.log("Monthly leave update successful!");
+    } catch (err) {
+        console.error("Error in monthly leave update:", err);
+    }
+});
 
 class EmployeeService {
     /**
@@ -85,6 +98,7 @@ class EmployeeService {
             throw new Error(`Failed to create employee: ${error.message}`);
         }
     }
+
 
     /**
      * Get employee with user details
