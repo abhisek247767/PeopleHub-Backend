@@ -44,6 +44,10 @@ const employeeSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    casualLeave: { type: Number, default: 1 },  
+    sickLeave: { type: Number, default: 1 },    
+    privilegeLeave: { type: Number, default: 1 },
+    cancelledLeave: { type: Number, default: 0 }, 
     // Removed password and role fields as they are handled by User schema
 }, { timestamps: true });
 
