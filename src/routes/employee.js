@@ -27,6 +27,13 @@ router.get('/employees', authenticate(), EmployeeController.getAllEmployees);
 router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById);
 
 /**
+ * @route GET /employees/emails
+ * @desc Get all employee emails
+ * @access Private (All authenticated users)
+ */
+router.get('/employees/emails', authenticate(), EmployeeController.getAllEmployeeEmails);
+
+/**
  * @route PUT /employees/:id
  * @desc Update employee data
  * @access Private (Admin or employee themselves)

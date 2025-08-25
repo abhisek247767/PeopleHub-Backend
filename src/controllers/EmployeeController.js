@@ -68,6 +68,27 @@ class EmployeeController {
     }
 
     /**
+     * Get all employee email
+     * GET /employees/emails
+     */
+    static async getAllEmployeeEmails(req, res) {
+        try {
+            const emails = await EmployeeService.getAllEmployeeEmails();
+            res.status(200).json({
+                success: true,
+                count: emails.length,
+                emails: emails
+            });
+        } catch (error) {
+            console.error('Error fetching employee emails:', error)
+            res.status(500).json({
+                success: false,
+                message: error.message
+            })
+        }
+    }
+
+    /**
      * Update employee
      * PUT /employees/:id
      */
