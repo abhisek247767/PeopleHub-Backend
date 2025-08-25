@@ -117,6 +117,22 @@ class EmployeeService {
         }
     }
 
+        /**
+     * Get all employees with emails
+     * @returns {Array} list of employee email
+     */
+        static async getAllEmployeeEmail() {
+            try {
+                const employees = await Employee.find({}).select('email').sort({ email: 1});
+
+                const emailList = employees.map(employee => employee.email)
+
+                return emailList;
+            } catch (error) {
+                throw new Error(`Failed to fetch employee emails: ${error.message}`);
+            }
+        }
+
     /**
      * Get all employees with pagination
      * @param {Number} page - Page number
