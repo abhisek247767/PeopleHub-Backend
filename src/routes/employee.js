@@ -32,7 +32,7 @@ router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById)
  * @access Private (All authenticated users)
  */
 router.get('/employees/emails', authenticate(), EmployeeController.getAllEmployeeEmails);
-
+/*
  * @route GET /employees/:id/leaves
  * @desc Get employee leave balances (sick, casual, privilege)
  * @access Private (All authenticated users)

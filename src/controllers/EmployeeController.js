@@ -85,7 +85,9 @@ class EmployeeController {
                 success: false,
                 message: error.message
             })
-     * Get employee leave balances
+        }
+    }
+     /* Get employee leave balances
      * GET /employees/:id/leaves
      */
     static async getEmployeeLeaves(req, res) {
