@@ -27,6 +27,13 @@ router.get('/employees', authenticate(), EmployeeController.getAllEmployees);
 router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById);
 
 /**
+ * @route GET /employees/:id/leaves
+ * @desc Get employee leave balances (sick, casual, privilege)
+ * @access Private (All authenticated users)
+ */
+router.get('/employees/:id/leaves', authenticate(), EmployeeController.getEmployeeLeaves);
+
+/**
  * @route PUT /employees/:id
  * @desc Update employee data
  * @access Private (Admin or employee themselves)
