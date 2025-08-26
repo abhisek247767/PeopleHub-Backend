@@ -27,6 +27,12 @@ router.get('/employees', authenticate(), EmployeeController.getAllEmployees);
 router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById);
 
 /**
+ * @route GET /employees/emails
+ * @desc Get all employee emails
+ * @access Private (All authenticated users)
+ */
+router.get('/employees/emails', authenticate(), EmployeeController.getAllEmployeeEmails);
+
  * @route GET /employees/:id/leaves
  * @desc Get employee leave balances (sick, casual, privilege)
  * @access Private (All authenticated users)
