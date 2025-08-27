@@ -4,6 +4,9 @@ This is the backend server for the **PeopleHub** application – an Employee Man
 
 ---
 
+<img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/b5a9e0f5-9ed3-4abc-a9e9-5b2004098924" />
+
+
 ## 🚀 Features
 
 - Employee CRUD operations
