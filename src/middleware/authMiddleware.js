@@ -4,10 +4,11 @@ const User = require("../models/userSchema");
 const authenticate = (roles = []) => {
   return async (req, res, next) => {
     try {
-      let token = req.cookies.authToken || req.headers.authorization;
-
-      if (token && token.startsWith('Bearer ')) {
-        token = token.split(' ')[1];
+      let token;
+      if(req.headers.authorization && req.headers.authorization.startsWith('Bearer ')){
+        token = req.headers.authorization.split(' ')[1];
+      }else if(req.cookies.authToken){
+        token = req.cookies.authToken;
       }
       if (!token) {
         console.log('No token provided');
@@ -19,6 +20,7 @@ const authenticate = (roles = []) => {
         decoded = jwt.verify(token, process.env.JWT_SECRET);
       } catch (error) {
         if (error.name === 'TokenExpiredError') {
+          // There is no refreshToken is present in the form of cookies -> make changes on index.js file 
           const refreshToken = req.cookies.refreshToken;
           if (!refreshToken) {
             console.log('Token expired and no refresh token provided');

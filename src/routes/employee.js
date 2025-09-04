@@ -20,24 +20,12 @@ router.post('/employees', authenticate(['admin', 'superadmin']), EmployeeControl
 router.get('/employees', authenticate(), EmployeeController.getAllEmployees);
 
 /**
- * @route GET /employees/:id
- * @desc Get employee by ID
- * @access Private (All authenticated users)
- */
-router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById);
-
-/**
  * @route GET /employees/emails
  * @desc Get all employee emails
  * @access Private (All authenticated users)
  */
 router.get('/employees/emails', authenticate(), EmployeeController.getAllEmployeeEmails);
-/*
- * @route GET /employees/:id/leaves
- * @desc Get employee leave balances (sick, casual, privilege)
- * @access Private (All authenticated users)
- */
-router.get('/employees/:id/leaves', authenticate(), EmployeeController.getEmployeeLeaves);
+
 
 /**
  * @route PUT /employees/:id
@@ -45,6 +33,29 @@ router.get('/employees/:id/leaves', authenticate(), EmployeeController.getEmploy
  * @access Private (Admin or employee themselves)
  */
 router.put('/employees/:id', authenticate(), EmployeeController.updateEmployee);
+
+
+/**
+ * @route GET /employees/:id
+ * @desc Get employee by ID
+ * @access Private (All authenticated users)
+ */
+router.get('/employees/:id', authenticate(), EmployeeController.getEmployeeById);
+
+/** 
+ * @route GET /employees/:id/leaves
+ * @desc Get employee leave balances (sick, casual, privilege)
+ * @access Private (All authenticated users)
+ */
+router.get('/employees/:id/leaves', authenticate(), EmployeeController.getEmployeeLeaves);
+
+/**
+* @route POST /employees/:id/leaves
+* @desc Apply for a new leave
+* @access Private (All authenticated users)
+*/ 
+router.post('/employees/:id/leaves', authenticate(), EmployeeController.applyLeave);
+
 
 /**
  * @route DELETE /employees/:id
