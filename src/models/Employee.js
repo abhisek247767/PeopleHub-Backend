@@ -1,41 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-// Model for leave requests
-const leaveSchema = new mongoose.Schema({
-     leaveType: {
-        type: String,
-        required: true,
-        enum: ['Casual', 'Sick', 'Privilege']
-    },
-    fromDate: {
-        type: Date,
-        required: true
-    },
-    toDate: {
-        type: Date,
-        required: true
-    },
-    numberOfDays: {
-        type: Number,
-        required: true
-    },
-    description: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    status: {
-        type: String,
-        required: true,
-        enum: ['Pending', 'Approved', 'Rejected', 'Cancelled'],
-        default: 'Pending'
-    },
-    appliedOn: {
-        type: Date,
-        default: Date.now
-    }
-}, { _id: true });
 
 const employeeSchema = new mongoose.Schema({
     user_id: {
@@ -80,12 +45,11 @@ const employeeSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    // For Testing Leave change the default value to large number
     casualLeave: { type: Number, default: 1 },  
     sickLeave: { type: Number, default: 1 },    
     privilegeLeave: { type: Number, default: 1 },
     cancelledLeave: { type: Number, default: 0 }, 
-
-    leaveRequests: [leaveSchema]
 
     // Removed password and role fields as they are handled by User schema
 }, { timestamps: true });
