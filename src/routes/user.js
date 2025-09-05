@@ -14,6 +14,7 @@ router.get('/subDepartment', fetchSubDepartment);
 
 // Profile Picture Upload and Retrieval
 router.put('/update-profile', authenticate(), updateProfile);
+
 router.get('/profile-picture/:userId', getProfilePicture);
 
 module.exports = router;
