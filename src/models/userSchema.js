@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
             validator: function(value) {
                 // Only validate password if it hasn't been hashed yet
                 if (this.isModified('password') && !value.startsWith('$2b$')) {
-                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(value);
+                    return /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{6,}$/.test(value);
                 }
                 return true;
             },
