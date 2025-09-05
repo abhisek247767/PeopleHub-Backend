@@ -228,7 +228,7 @@ const loginUser = async (req, res) => {
                 verified: user.verified
             },
             token,
-            refreshToken
+            // refreshToken
         });
 
     } catch(error) {
