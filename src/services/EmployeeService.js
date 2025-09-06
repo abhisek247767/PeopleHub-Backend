@@ -1,5 +1,6 @@
 const User = require('../models/userSchema');
 const Employee = require('../models/Employee');
+const Leave = require('../models/leave');
 const Project = require('../models/Project');
 const mongoose = require('mongoose');
 const cron = require('node-cron');
@@ -107,10 +108,17 @@ class EmployeeService {
      */
     static async getEmployeeById(employeeId) {
         try {
+            // console.log(employee.user_id)
+            // Adding check whether Id is present or not before assigning 
+            if(!mongoose.Types.ObjectId.isValid(employeeId)){
+                throw new Error(`Invaild employee ID: ${employeeId}`)
+            }
+            // console.log(employeeId)
             const employee = await Employee.findById(employeeId).populate('user');
             if (!employee) {
                 throw new Error('Employee not found');
             }
+            // console.log(employee)
             return employee;
         } catch (error) {
             throw new Error(`Failed to fetch employee: ${error.message}`);
@@ -121,7 +129,7 @@ class EmployeeService {
      * Get all employees with emails
      * @returns {Array} list of employee email
      */
-        static async getAllEmployeeEmail() {
+        static async getAllEmployeeEmails() {
             try {
                 const employees = await Employee.find({}).select('email').sort({ email: 1});
 
@@ -190,10 +198,16 @@ class EmployeeService {
                 throw new Error(`Invalid employee ID format: ${employeeId}`);
             }
 
+            // findById fetches Employee unique id not the User's ID from the database, instead of findById, use findOne with specific paramenter.
+            
+            // const employee = await Employee.findById(employeeId).select(
+                //     'sickLeave casualLeave privilegeLeave'
+                // );
+                
             // Fetch employee with leave fields only
-            const employee = await Employee.findById(employeeId).select(
+            const employee = await Employee.findOne({user_id : employeeId}).select(
                 'sickLeave casualLeave privilegeLeave'
-            );
+            )
 
             if (!employee) {
                 throw new Error('Employee not found');
@@ -207,6 +221,74 @@ class EmployeeService {
         } catch (error) {
             throw new Error(`Failed to fetch employee leaves: ${error.message}`);
         }
+    }
+
+    /**
+     * Apply for new leave
+     * @param {string} userId - ID of user who apply for leave
+     * @param {object} leaveData - Leave data from the form
+     * @returns {object} create New leave request 
+     */
+    static async applyLeave(userId, leaveData){
+        const {fromDate, toDate, leaveType, description} = leaveData;
+        if(!fromDate || !toDate || !leaveType|| !description){
+            throw new Error('All fields are required.');
+        }
+
+        const startDate = new Date(fromDate);
+        const endDate = new Date(toDate);
+
+        if(endDate < startDate){
+            throw new Error('Dates are invalid, Please enter vaild dates.');
+        }
+
+        const numberOfDays = Math.ceil((endDate - startDate)/(1000 * 60 * 60 * 24)) + 1;
+        if(numberOfDays <= 0){
+            throw new Error('Leave must be for atleast one day.');
+        }
+
+        const employee = await Employee.findOne({user_id: userId});
+        if(!employee){
+            throw new Error('Employee is not found');
+        }
+
+        switch(leaveType){
+            case 'Casual':
+                if(employee.casualLeave < numberOfDays){
+                    throw new Error('Insufficient Casual Leave balance.');
+                }
+                employee.casualLeave -= numberOfDays;
+                break;
+        
+            case 'Sick':
+                 if(employee.sickLeave < numberOfDays){
+                    throw new Error('Insufficient Sick Leave balance.');
+                }
+                employee.sickLeave -= numberOfDays;
+                break;
+        
+            case 'Privilege':
+                if(employee.privilegeLeave < numberOfDays){
+                    throw new Error('Insufficient Privilege Leave balance.');
+                }
+                employee.privilegeLeave -= numberOfDays;
+                break;
+            default:
+                throw new Error('Invalid leave type specified.');
+        }
+
+        const newLeave = await Leave.create({
+            employee: employee._id,
+            leaveType,
+            fromDate,
+            toDate,
+            numberOfDays,
+            description,
+        });
+
+        await employee.save();
+
+        return newLeave;
     }
 
     /**

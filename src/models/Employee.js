@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
+
 const employeeSchema = new mongoose.Schema({
     user_id: {
         type: mongoose.Schema.Types.ObjectId,
@@ -44,10 +45,12 @@ const employeeSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    // For Testing Leave change the default value to large number
     casualLeave: { type: Number, default: 1 },  
     sickLeave: { type: Number, default: 1 },    
     privilegeLeave: { type: Number, default: 1 },
     cancelledLeave: { type: Number, default: 0 }, 
+
     // Removed password and role fields as they are handled by User schema
 }, { timestamps: true });
 

@@ -93,7 +93,7 @@ class EmployeeController {
     static async getEmployeeLeaves(req, res) {
         try {
             const employeeId = req.params.id;
-
+            console.log("Employee ID used in getEmployeeLeaves: ", employeeId)
             const leaves = await EmployeeService.getEmployeeLeaves(employeeId);
 
             res.status(200).json({
@@ -109,6 +109,34 @@ class EmployeeController {
             });
         }
     }
+
+    /**
+     * Apply for leave
+     * POST /employees/:id/leaves
+    */
+   static async applyLeave(req,res){
+    try{
+        const userId = req.params.id;
+        const  leaveData = req.body;
+
+        if(req.user.userId != userId){
+            return res.status(403).json({message: 'Forbidden: You can only apply for your own leave.'});
+        }
+        const result = await EmployeeService.applyLeave(userId, leaveData);
+        res.status(201).json({
+            success: true,
+            message: 'Leave applied successfully',
+            data: result
+        });
+
+    }catch(err){
+        console.error('Error in applying for leave:', err);
+        res.status(400).json({
+            success: false,
+            message: err.message
+        });
+    }
+   }
 
     /**
      * Update employee
