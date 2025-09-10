@@ -1,5 +1,6 @@
 const User = require('../models/userSchema');
 const Employee = require('../models/Employee');
+const Leave = require('../models/leave');
 const Project = require('../models/Project');
 const mongoose = require('mongoose');
 const cron = require('node-cron');
@@ -224,7 +225,7 @@ class EmployeeService {
 
     /**
      * Apply for new leave
-     * @param {string} userId - ID of user how apply for leave
+     * @param {string} userId - ID of user who apply for leave
      * @param {object} leaveData - Leave data from the form
      * @returns {object} create New leave request 
      */
@@ -253,36 +254,41 @@ class EmployeeService {
 
         switch(leaveType){
             case 'Casual':
-                // if(employee.casualLeave < numberOfDays) throw new Error('Insufficient Casual Leave balance');
-                employee.casualLeave += numberOfDays;
+                if(employee.casualLeave < numberOfDays){
+                    throw new Error('Insufficient Casual Leave balance.');
+                }
+                employee.casualLeave -= numberOfDays;
                 break;
         
             case 'Sick':
-                // if(employee.sickLeave < numberOfDays) throw new Error('Insufficient Sick Leave balance');
-                employee.sickLeave += numberOfDays;
+                 if(employee.sickLeave < numberOfDays){
+                    throw new Error('Insufficient Sick Leave balance.');
+                }
+                employee.sickLeave -= numberOfDays;
                 break;
         
             case 'Privilege':
-                // if(employee.privilegeLeave < numberOfDays) throw new Error('Insufficient Privilege Leave balance');
-                employee.privilegeLeave += numberOfDays;
+                if(employee.privilegeLeave < numberOfDays){
+                    throw new Error('Insufficient Privilege Leave balance.');
+                }
+                employee.privilegeLeave -= numberOfDays;
                 break;
             default:
                 throw new Error('Invalid leave type specified.');
         }
 
-        const newLeave = {
+        const newLeave = await Leave.create({
+            employee: employee._id,
             leaveType,
             fromDate,
             toDate,
             numberOfDays,
             description,
-        };
-
-         employee.leaveRequests.push(newLeave);
+        });
 
         await employee.save();
 
-        return employee.leaveRequests[employee.leaveRequests.lenght - 1];
+        return newLeave;
     }
 
     /**
