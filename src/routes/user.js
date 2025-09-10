@@ -13,7 +13,7 @@ router.get('/departments', fetchDepartment);
 router.get('/subDepartment', fetchSubDepartment);
 
 // Profile Picture Upload and Retrieval
-router.get('/profile-picture/:userId', getProfilePicture);
+router.get('/profile-picture/:userId', getProfilePicture);v
 router.put('/update-profile', authenticate(), updateProfile);
 
 module.exports = router;
