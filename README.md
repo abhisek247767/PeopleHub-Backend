@@ -3,8 +3,12 @@
 This is the backend server for the **PeopleHub** application – an Employee Management System. It is built with **Node.js**, **Express**, and **MongoDB** and handles authentication, session management, email notifications, and integration with an external API.
 
 ---
-
+## GSSOC-2025
 <img width="1280" height="720" alt="image" src="https://github.com/user-attachments/assets/b5a9e0f5-9ed3-4abc-a9e9-5b2004098924" />
+
+## Hacktoberfest 2025
+<img width="1382" height="682" alt="image" src="https://github.com/user-attachments/assets/47d0b51e-373b-4b79-aff2-ba20aafc9046" />
+
 
 
 ## 🚀 Features
