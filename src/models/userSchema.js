@@ -9,9 +9,20 @@ const userSchema = new mongoose.Schema({
         required: [true, "Email is required"],
         unique: true,
         validate: {
-            validator: validator.isEmail,
+            // Change validator as email is modify -> prefix+email
+            validator: (value) =>{
+                const emailParts = value.includes('+') ? value.split('+').slice(1).join('+') : value;
+                return validator.isEmail(emailParts);
+            },
             message: "Please enter a valid email",
         },
+    },
+
+    baseEmail: {
+        type: String,
+        required: true,
+        trim : true,
+        lowercase: true,
     },
     password: {
         type: String,

@@ -4,6 +4,26 @@ const bcrypt = require("bcrypt");
 const generateVerificationCode = require('../utils/generateVerificationCode');
 const {sendVerificationEmail} = require('../services/mailService');
 
+
+// Helper function for parsing email and role
+const parseEmailandRole = (email) => {
+    let userRole = 'user'; //Default role
+    let userEmail = email;
+    const lowerCaseEmail = email.toLowerCase();
+
+    if(lowerCaseEmail.includes('+')){
+        const mailParts = email.split('+');
+        const mailPrefix = mailParts[0].toLowerCase();  
+        // Check if prefix is 'admin' or 'superadmin'
+        if(['admin', 'superadmin'].includes(mailPrefix)){
+            userRole = mailPrefix;
+            userEmail = mailParts.slice(1).join('+');
+        }
+    }
+
+    return { role : userRole, baseEmail: userEmail.toLowerCase(), fullEmail : lowerCaseEmail };
+}
+
 const createUser = async (req, res) => {
     try {
         // Extract data from request body
@@ -18,8 +38,10 @@ const createUser = async (req, res) => {
             return res.status(400).json({ message: "Passwords do not match" });
         }
 
-        // Check if user already exists
-        const existingUser = await User.findOne({ email });
+        const {role, baseEmail, fullEmail} = parseEmailandRole(email);
+
+        // Check if user already exists ->  it uses prefix+email as a unique email
+        const existingUser = await User.findOne({ email: fullEmail });
         if (existingUser) {
             return res.status(400).json({ message: "User with this email already exists" });
         }
@@ -29,8 +51,10 @@ const createUser = async (req, res) => {
         // Create user with unverified status (no profilePicture)
         const user = new User({ 
             username, 
-            email, 
-            password, 
+            email : fullEmail,
+            baseEmail : baseEmail, 
+            password,
+            role : role, 
             verificationCode, 
             verificationCodeValidation: new Date(Date.now() + 3600000), // 1 hour
             verified: false
@@ -40,7 +64,7 @@ const createUser = async (req, res) => {
 
         // Send verification email
         try {
-            await sendVerificationEmail(email, username, verificationCode);
+            await sendVerificationEmail(baseEmail, username, verificationCode);
             console.log("Verification email sent successfully");
         } catch (emailError) {
             console.error("Failed to send verification email:", emailError);
@@ -81,7 +105,8 @@ const verifyUser = async (req, res) => {
             return res.status(400).json({ message: "Email and verification code are required" });
         }
 
-        const user = await User.findOne({ email });
+
+        const user = await User.findOne({ email : email.toLowerCase()});
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -128,7 +153,7 @@ const resendVerificationCode = async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email : email.toLowerCase() });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
@@ -162,13 +187,13 @@ const resendVerificationCode = async (req, res) => {
 
 const loginUser = async (req, res) => {
     const { email, password } = req.body;
-    
     if (!email || !password) {
         return res.status(400).json({ errors: { message: "Email and password are required" } });
     }
 
     try {
-        const user = await User.findOne({ email });
+        
+        const user = await User.findOne({ email: email.toLowerCase() });
         if (!user) {
             return res.status(401).json({ errors: { message: "Invalid email or password" } });
         }
@@ -245,7 +270,7 @@ const forgotPassword = async (req, res) => {
             return res.status(400).json({ message: "Email is required" });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email : email.toLowerCase() });
         if (!user) {
             // Don't reveal if user exists or not for security
             return res.status(200).json({ 
@@ -292,7 +317,7 @@ const resetPassword = async (req, res) => {
             return res.status(400).json({ message: "Password must be at least 6 characters long" });
         }
 
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email : email.toLowerCase() });
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
