@@ -1,73 +1,75 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 
-
-const employeeSchema = new mongoose.Schema({
+const employeeSchema = new mongoose.Schema(
+  {
     user_id: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-        required: true,
-        unique: true // One user can have only one employee record
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      unique: true,
     },
     employeeName: {
-        type: String,
-        required: true,
-        trim: true // Removing whitespace from both ends of a string
+      type: String,
+      required: true,
+      trim: true,
     },
     contactNo: {
-        type: String,
-        required: true,
-        unique: true, // Assuming contact number should be unique
-        trim: true
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
     },
     email: {
-        type: String,
-        required: [true, "Email is required"],
-        unique: true,
-        lowercase: true, // Stores emails in lowercase
-        validate: {
-            validator: validator.isEmail,
-            message: "Please enter a valid email",
-        },
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      lowercase: true,
+      validate: {
+        validator: validator.isEmail,
+        message: "Please enter a valid email",
+      },
     },
     gender: {
-        type: String,
-        required: true,
-        enum: ['Male', 'Female', 'Other'] // Restrict to specific values
+      type: String,
+      required: true,
+      enum: ["Male", "Female", "Other"],
     },
     department: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
     subDepartment: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
     // For Testing Leave change the default value to large number
-    casualLeave: { type: Number, default: 1 },  
-    sickLeave: { type: Number, default: 1 },    
+    casualLeave: { type: Number, default: 1 },
+    sickLeave: { type: Number, default: 1 },
     privilegeLeave: { type: Number, default: 1 },
-    cancelledLeave: { type: Number, default: 0 }, 
+    cancelledLeave: { type: Number, default: 0 },
 
     // Removed password and role fields as they are handled by User schema
-}, { timestamps: true });
+  },
+  { timestamps: true }
+);
 
 // Index for better query performance
 employeeSchema.index({ user_id: 1, email: 1 });
 
 // Virtual to populate user data
-employeeSchema.virtual('user', {
-    ref: 'User',
-    localField: 'user_id',
-    foreignField: '_id',
-    justOne: true
+employeeSchema.virtual("user", {
+  ref: "User",
+  localField: "user_id",
+  foreignField: "_id",
+  justOne: true,
 });
 
 // Ensure virtual fields are serialized
-employeeSchema.set('toJSON', { virtuals: true });
+employeeSchema.set("toJSON", { virtuals: true });
 
-const Employee = mongoose.model('Employee', employeeSchema);
+const Employee = mongoose.model("Employee", employeeSchema);
 
 module.exports = Employee;
